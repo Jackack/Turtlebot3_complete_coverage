@@ -1,0 +1,38 @@
+#!/usr/bin/env python
+
+
+import rospy
+import yaml
+from dev.go_to_specific_point_on_map import GoToPose
+from dev.measure_coverage import MeasureAreaCovered
+
+if __name__ == '__main__':
+    print("follow_route running")
+    rospy.loginfo("follow_route running")
+    # Read information from yaml file
+    with open("/home/jack/catkin_ws/src/turtlebot3/dev/nodes/route.yaml", 'r') as stream:
+        dataMap = yaml.load(stream)
+
+    print("loaded")
+
+    m = MeasureAreaCovered()
+    try:
+        # Initialize
+        rospy.init_node('follow_route', anonymous=False)
+        navigator = GoToPose()
+
+        for obj in dataMap:
+            if rospy.is_shutdown():
+                break
+            name = obj['filename']
+            print(obj)
+            # Navigation
+            rospy.loginfo("Go to %s pose", name[:-4])
+            navigator.goto(obj['position'], obj['rotation'])
+            rospy.loginfo("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Reached %s pose", name[:-4])
+
+        m.disp()
+
+
+    except rospy.ROSInterruptException:
+        rospy.loginfo("Ctrl-C caught. Quitting")

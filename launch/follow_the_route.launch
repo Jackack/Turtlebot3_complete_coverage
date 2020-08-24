@@ -1,0 +1,30 @@
+<launch>
+  <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
+  <param name="model" value="$(arg model)"/>
+
+  <include file="$(find dev)/launch/gazebo_turtlebot3_world.launch" args="">
+  <arg name="x_pos" value="-0.95"/>
+  <arg name="y_pos" value="2.4"/>
+  <arg name="z_pos" value="0.0"/>
+  </include>
+
+  <!-- Map server-->
+  <node pkg="map_server" name="map_server" type="map_server" args="$(find dev)/map.yaml"/>  
+
+  <node pkg="dev" type="follow_the_route" name="follow_the_route"  output="screen">
+  </node>
+
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+    <param name="publish_frequency" type="double" value="100.0" />
+  </node>
+
+  <!-- map and odom transform -->
+  <node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="0 0 0 0 0 0 1 map odom 100" />
+
+  <!-- trajectory -->
+  <node pkg="hector_trajectory_server" type="hector_trajectory_server" name="trajectory"/>
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find turtlebot3_description)/rviz/model.rviz"/>
+
+
+</launch>

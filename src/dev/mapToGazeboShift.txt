@@ -1,0 +1,1 @@
+(x, y) -> (x * resolution, y *resolution) -> (x - width * resolution * 0.5, y - height * resolution * 0.5)
